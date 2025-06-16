@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { AddPluginDialog } from "./AddPluginDialog";
 
 export function PluginManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,10 +61,7 @@ export function PluginManagement() {
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-900">Plugin Management</h2>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Plugin
-        </Button>
+        <AddPluginDialog />
       </div>
 
       {/* Filters */}
