@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { 
   LayoutDashboard, 
   Settings, 
@@ -52,9 +51,12 @@ const menuItems = [
   },
 ];
 
-export function AppSidebar() {
-  const [activeSection, setActiveSection] = useState("dashboard");
+interface AppSidebarProps {
+  activeSection: string;
+  setActiveSection: (section: string) => void;
+}
 
+export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps) {
   return (
     <Sidebar className="border-r border-gray-200">
       <SidebarHeader className="px-6 py-4 border-b border-gray-200">

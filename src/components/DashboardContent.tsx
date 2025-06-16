@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { OverviewSection } from "./dashboard/OverviewSection";
 import { PluginManagement } from "./dashboard/PluginManagement";
@@ -7,9 +6,12 @@ import { JobQueueSection } from "./dashboard/JobQueueSection";
 import { WorkerStatus } from "./dashboard/WorkerStatus";
 import { LogsViewer } from "./dashboard/LogsViewer";
 
-export function DashboardContent() {
-  const [activeSection, setActiveSection] = useState("dashboard");
+interface DashboardContentProps {
+  activeSection: string;
+  setActiveSection: (section: string) => void;
+}
 
+export function DashboardContent({ activeSection }: DashboardContentProps) {
   const renderSection = () => {
     switch (activeSection) {
       case "plugins":
