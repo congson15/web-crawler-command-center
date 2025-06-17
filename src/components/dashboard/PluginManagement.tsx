@@ -1,10 +1,12 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { AddPluginDialog } from "./AddPluginDialog";
 
 export function PluginManagement() {
@@ -88,55 +90,59 @@ export function PluginManagement() {
         </CardContent>
       </Card>
 
-      {/* Plugins Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredPlugins.map((plugin) => (
-          <Card key={plugin.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg">{plugin.name}</CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">{plugin.website}</p>
-                </div>
-                <Badge variant={plugin.status === 'active' ? 'default' : 'secondary'}>
-                  {plugin.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Last Run:</span>
-                  <p className="font-medium">{plugin.lastRun}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Jobs Today:</span>
-                  <p className="font-medium">{plugin.jobsToday}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Success Rate:</span>
-                  <p className="font-medium text-green-600">{plugin.successRate}%</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  View
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                  Run Now
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Plugins Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Plugins ({filteredPlugins.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Plugin Name</TableHead>
+                <TableHead>Website</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Last Run</TableHead>
+                <TableHead>Jobs Today</TableHead>
+                <TableHead>Success Rate</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredPlugins.map((plugin) => (
+                <TableRow key={plugin.id}>
+                  <TableCell className="font-medium">{plugin.name}</TableCell>
+                  <TableCell className="text-gray-600">{plugin.website}</TableCell>
+                  <TableCell>
+                    <Badge variant={plugin.status === 'active' ? 'default' : 'secondary'}>
+                      {plugin.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{plugin.lastRun}</TableCell>
+                  <TableCell>{plugin.jobsToday}</TableCell>
+                  <TableCell className="text-green-600">{plugin.successRate}%</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        Run Now
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

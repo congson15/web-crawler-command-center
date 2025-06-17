@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +27,8 @@ export function AddPluginDialog() {
   const [jsonResponse, setJsonResponse] = useState("");
   const [newFieldName, setNewFieldName] = useState("");
   const [newFieldPath, setNewFieldPath] = useState("");
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleUrlSubmit = async () => {
     if (!url) {
@@ -40,6 +41,7 @@ export function AddPluginDialog() {
     }
     
     setIsLoading(true);
+    setIframeLoaded(false);
     
     if (urlType === "json") {
       try {
@@ -116,6 +118,121 @@ export function AddPluginDialog() {
     setOpen(false);
   };
 
+  // Function to generate CSS selector for an element
+  const generateSelector = (element: Element): string => {
+    if (element.id) {
+      return `#${element.id}`;
+    }
+    
+    let selector = element.tagName.toLowerCase();
+    
+    if (element.className) {
+      const classes = element.className.split(' ').filter(c => c.trim());
+      if (classes.length > 0) {
+        selector += '.' + classes.join('.');
+      }
+    }
+    
+    // Add nth-child if needed for uniqueness
+    const parent = element.parentElement;
+    if (parent) {
+      const siblings = Array.from(parent.children).filter(child => 
+        child.tagName === element.tagName && 
+        child.className === element.className
+      );
+      if (siblings.length > 1) {
+        const index = siblings.indexOf(element) + 1;
+        selector += `:nth-child(${index})`;
+      }
+    }
+    
+    return selector;
+  };
+
+  // Handle iframe load and inject click handler
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframeLoaded || urlType !== 'html') return;
+
+    const handleIframeLoad = () => {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!iframeDoc) return;
+
+        // Inject click handler
+        const script = iframeDoc.createElement('script');
+        script.textContent = `
+          document.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const element = e.target;
+            const rect = element.getBoundingClientRect();
+            
+            // Generate selector
+            let selector = '';
+            if (element.id) {
+              selector = '#' + element.id;
+            } else {
+              selector = element.tagName.toLowerCase();
+              if (element.className) {
+                const classes = element.className.split(' ').filter(c => c.trim());
+                if (classes.length > 0) {
+                  selector += '.' + classes.join('.');
+                }
+              }
+            }
+            
+            // Get text content
+            const textContent = element.textContent || element.innerText || '';
+            
+            // Send message to parent window
+            window.parent.postMessage({
+              type: 'elementSelected',
+              selector: selector,
+              text: textContent.trim(),
+              tagName: element.tagName.toLowerCase()
+            }, '*');
+          });
+        `;
+        iframeDoc.head.appendChild(script);
+      } catch (error) {
+        console.log('Cannot access iframe content due to CORS restrictions');
+      }
+    };
+
+    iframe.addEventListener('load', handleIframeLoad);
+    return () => iframe.removeEventListener('load', handleIframeLoad);
+  }, [iframeLoaded, urlType]);
+
+  // Listen for messages from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'elementSelected') {
+        const { selector, text, tagName } = event.data;
+        
+        // Generate field name based on element content or tag
+        const fieldName = text.slice(0, 30) || `${tagName}_field`;
+        
+        const newField: SelectedField = {
+          name: fieldName,
+          selector: selector,
+          type: 'html'
+        };
+
+        setSelectedFields(prev => [...prev, newField]);
+        
+        toast({
+          title: "Field Added",
+          description: `Added field: ${fieldName}`,
+        });
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [toast]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -132,6 +249,7 @@ export function AddPluginDialog() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Configuration Panel */}
           <div className="space-y-6">
+            {/* ... keep existing code (plugin name, url type, target url inputs) */}
             <div className="space-y-4">
               <div>
                 <Label htmlFor="pluginName" className="text-base font-medium">Plugin Name</Label>
@@ -273,10 +391,11 @@ export function AddPluginDialog() {
                 urlType === 'html' ? (
                   <div className="border rounded-lg overflow-hidden h-[600px] mt-2">
                     <iframe
+                      ref={iframeRef}
                       src={url}
                       className="w-full h-full"
                       title="Website Preview"
-                      sandbox="allow-scripts allow-same-origin"
+                      onLoad={() => setIframeLoaded(true)}
                     />
                   </div>
                 ) : (
