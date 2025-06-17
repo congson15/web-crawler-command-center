@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Code, Plus, Trash2, Eye } from "lucide-react";
+import { Code, Eye, Sparkles, Trash2, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { JsonTreeViewer } from "./JsonTreeViewer";
 
 interface SelectedField {
   name: string;
@@ -24,10 +24,9 @@ interface JsonFieldConfiguratorProps {
 
 export function JsonFieldConfigurator({ url, selectedFields, setSelectedFields }: JsonFieldConfiguratorProps) {
   const { toast } = useToast();
-  const [newFieldName, setNewFieldName] = useState("");
-  const [newFieldPath, setNewFieldPath] = useState("");
-  const [jsonResponse, setJsonResponse] = useState("");
+  const [jsonResponse, setJsonResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [rawJsonText, setRawJsonText] = useState("");
 
   const fetchJsonData = async () => {
     if (!url) return;
@@ -36,7 +35,8 @@ export function JsonFieldConfigurator({ url, selectedFields, setSelectedFields }
     try {
       const response = await fetch(url);
       const data = await response.json();
-      setJsonResponse(JSON.stringify(data, null, 2));
+      setJsonResponse(data);
+      setRawJsonText(JSON.stringify(data, null, 2));
       toast({
         title: "Success",
         description: "JSON data loaded successfully",
@@ -44,205 +44,197 @@ export function JsonFieldConfigurator({ url, selectedFields, setSelectedFields }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch JSON data",
+        description: "Failed to fetch JSON data. CORS issues may prevent direct API calls.",
         variant: "destructive",
       });
-      setJsonResponse("");
+      setJsonResponse(null);
+      setRawJsonText("");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const addJsonField = () => {
-    if (!newFieldName || !newFieldPath) {
-      toast({
-        title: "Error",
-        description: "Please enter both field name and JSON path",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Try to extract preview from JSON response
-    let preview = "";
-    if (jsonResponse) {
-      try {
-        const data = JSON.parse(jsonResponse);
-        const value = getNestedValue(data, newFieldPath);
-        preview = value ? String(value).slice(0, 50) : "";
-      } catch (error) {
-        console.warn("Could not extract preview from JSON");
-      }
-    }
-
-    const newField: SelectedField = {
-      name: newFieldName,
-      selector: newFieldPath,
-      type: 'json',
-      preview
-    };
-
-    setSelectedFields([...selectedFields, newField]);
-    setNewFieldName("");
-    setNewFieldPath("");
+  const handleFieldSelect = (path: string, fieldName: string, value: any) => {
+    const existingIndex = selectedFields.findIndex(field => field.selector === path);
     
-    toast({
-      title: "Field Added",
-      description: `Added JSON field: ${newFieldName}`,
-    });
+    if (existingIndex >= 0) {
+      // Remove if already selected
+      setSelectedFields(selectedFields.filter((_, i) => i !== existingIndex));
+      toast({
+        title: "Field Removed",
+        description: `Removed field: ${fieldName}`,
+      });
+    } else {
+      // Add new field
+      const newField: SelectedField = {
+        name: fieldName,
+        selector: path,
+        type: 'json',
+        preview: String(value).slice(0, 50)
+      };
+
+      setSelectedFields([...selectedFields, newField]);
+      toast({
+        title: "Field Added",
+        description: `Added field: ${fieldName}`,
+      });
+    }
   };
 
   const removeField = (index: number) => {
     setSelectedFields(selectedFields.filter((_, i) => i !== index));
   };
 
-  const getNestedValue = (obj: any, path: string): any => {
-    return path.split('.').reduce((current, key) => {
-      if (key.includes('[') && key.includes(']')) {
-        const arrayKey = key.substring(0, key.indexOf('['));
-        const arrayIndex = parseInt(key.substring(key.indexOf('[') + 1, key.indexOf(']')));
-        return current?.[arrayKey]?.[arrayIndex];
-      }
-      return current?.[key];
-    }, obj);
-  };
+  const selectedPaths = selectedFields.map(field => field.selector);
 
   return (
-    <div className="space-y-6">
-      {/* JSON API Response */}
-      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
+    <div className="space-y-8">
+      {/* API Configuration */}
+      <Card className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-blue-200 shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <Code className="h-5 w-5" />
-              JSON API Response
+            <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-blue-500 rounded-lg shadow-lg">
+                <Code className="h-6 w-6 text-white" />
+              </div>
+              JSON API Configuration
             </CardTitle>
             <Button 
               onClick={fetchJsonData} 
               disabled={isLoading || !url}
-              className="bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-xl shadow-blue-200 transition-all duration-300 hover:scale-105"
             >
-              {isLoading ? "Loading..." : "Fetch Data"}
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Fetch Data
+                </>
+              )}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="p-3 bg-slate-100 rounded-lg border">
-              <code className="text-sm font-mono text-slate-600">
-                GET {url || "Enter URL above"}
-              </code>
-            </div>
-            {jsonResponse ? (
-              <div className="relative">
-                <Textarea
-                  value={jsonResponse}
-                  readOnly
-                  className="min-h-[300px] font-mono text-xs bg-slate-900 text-green-400 border-slate-700"
-                  placeholder="JSON response will appear here..."
-                />
-                <Badge className="absolute top-2 right-2 bg-green-600">
-                  Valid JSON
-                </Badge>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-slate-300 rounded-lg h-[300px] flex items-center justify-center">
-                <div className="text-center text-slate-500">
-                  <Code className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p className="font-medium">No JSON data loaded</p>
-                  <p className="text-sm">Click "Fetch Data" to load the API response</p>
-                </div>
-              </div>
-            )}
+          <div className="p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100 shadow-inner">
+            <code className="text-sm font-mono text-slate-700 break-all">
+              GET {url || "Enter URL in previous step"}
+            </code>
           </div>
         </CardContent>
       </Card>
 
-      {/* Field Configuration */}
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-blue-800">Add JSON Fields</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="fieldName" className="text-sm font-medium text-blue-800">Field Name</Label>
-              <Input
-                id="fieldName"
-                value={newFieldName}
-                onChange={(e) => setNewFieldName(e.target.value)}
-                placeholder="e.g., product_title"
-                className="mt-1 h-10 border-blue-200 focus:border-blue-400"
-              />
+      {/* Interactive JSON Explorer */}
+      {jsonResponse && (
+        <Card className="bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 border-emerald-200 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-emerald-500 rounded-lg shadow-lg">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              Interactive JSON Explorer
+              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300">
+                Click to Add Fields
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <JsonTreeViewer
+              data={jsonResponse}
+              onFieldSelect={handleFieldSelect}
+              selectedPaths={selectedPaths}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Raw JSON View (fallback) */}
+      {rawJsonText && (
+        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <Code className="h-5 w-5" />
+              Raw JSON Response
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <pre className="bg-slate-900 text-green-400 p-4 rounded-xl overflow-auto max-h-64 text-xs font-mono border border-slate-700 shadow-inner">
+                {rawJsonText}
+              </pre>
+              <Badge className="absolute top-3 right-3 bg-green-600 text-white">
+                Valid JSON
+              </Badge>
             </div>
-            <div>
-              <Label htmlFor="fieldPath" className="text-sm font-medium text-blue-800">JSON Path</Label>
-              <Input
-                id="fieldPath"
-                value={newFieldPath}
-                onChange={(e) => setNewFieldPath(e.target.value)}
-                placeholder="e.g., data.products[0].title"
-                className="mt-1 h-10 border-blue-200 focus:border-blue-400"
-              />
-            </div>
-          </div>
-          <Button 
-            onClick={addJsonField} 
-            className="w-full bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200"
-            disabled={!newFieldName || !newFieldPath}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Field
-          </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Selected Fields */}
-      <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+      <Card className="bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 border-violet-200 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            Configured Fields ({selectedFields.length})
+          <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-violet-500 rounded-lg shadow-lg">
+              <Eye className="h-6 w-6 text-white" />
+            </div>
+            Selected Fields ({selectedFields.length})
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {selectedFields.length === 0 ? (
-            <div className="text-center py-8 text-emerald-600">
-              <Code className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p className="text-lg font-medium">No fields configured yet</p>
-              <p className="text-sm">Add JSON path selectors above</p>
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-violet-100 to-purple-100 rounded-full flex items-center justify-center">
+                <Sparkles className="h-10 w-10 text-violet-500" />
+              </div>
+              <p className="text-lg font-medium text-slate-700">No fields selected yet</p>
+              <p className="text-slate-500">Use the interactive JSON explorer above to add fields</p>
             </div>
           ) : (
-            selectedFields.map((field, index) => (
-              <div key={index} className="group bg-white p-4 rounded-xl border border-emerald-200 shadow-sm hover:shadow-md transition-all duration-200">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-medium text-gray-900">{field.name}</h4>
-                      <Badge variant="outline" className="text-xs bg-emerald-100 text-emerald-700 border-emerald-300">
-                        {field.type}
-                      </Badge>
+            <div className="grid gap-4">
+              {selectedFields.map((field, index) => (
+                <div key={index} className="group relative">
+                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-violet-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h4 className="font-bold text-slate-800 text-lg">{field.name}</h4>
+                          <Badge className="bg-violet-100 text-violet-700 border-violet-300 px-3 py-1">
+                            {field.type}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Path:</span>
+                            <code className="text-xs bg-slate-100 px-2 py-1 rounded border font-mono text-slate-700">
+                              {field.selector}
+                            </code>
+                          </div>
+                          {field.preview && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Preview:</span>
+                              <span className="text-sm text-slate-600 italic bg-slate-50 px-2 py-1 rounded">
+                                "{field.preview}..."
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeField(index)}
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-200 ml-4 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-200"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <p className="text-xs text-gray-500 mb-1 font-mono bg-gray-50 p-2 rounded border">
-                      {field.selector}
-                    </p>
-                    {field.preview && (
-                      <p className="text-sm text-gray-600 italic">
-                        Preview: "{field.preview}..."
-                      </p>
-                    )}
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => removeField(index)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity ml-3 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
