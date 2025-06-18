@@ -121,7 +121,7 @@ export function JsonPreview({ data, maxDepth = 2, currentDepth = 0 }: JsonPrevie
               className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 transition-colors"
             >
               <ChevronRight className="h-3 w-3" />
-              <span>{{{keys.length} keys}}</span>
+              <span>{"{"}{keys.length} keys{"}"}</span>
             </button>
             <Button
               size="sm"
@@ -143,7 +143,7 @@ export function JsonPreview({ data, maxDepth = 2, currentDepth = 0 }: JsonPrevie
               className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 transition-colors"
             >
               <ChevronDown className="h-3 w-3" />
-              <span>{{{keys.length} keys}}</span>
+              <span>{"{"}{keys.length} keys{"}"}</span>
             </button>
             <Button
               size="sm"
