@@ -54,7 +54,6 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
   };
 
   const generateFieldName = (key: string, path: string): string => {
-    // Smart field name generation
     const cleanKey = key.replace(/[_-]/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2');
     const words = cleanKey.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1));
     return words.join(' ');
@@ -65,7 +64,8 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     const isExpandable = nodeType === 'object' || nodeType === 'array';
     const isExpanded = expandedNodes.has(path);
     const isSelected = selectedPaths.includes(path);
-    const canSelect = !isExpandable && value !== null;
+    // Cho phép select tất cả types, bao gồm arrays và objects
+    const canSelect = value !== null;
 
     return (
       <div key={path} className="relative">
@@ -115,7 +115,7 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
             </span>
           )}
 
-          {/* Select Button */}
+          {/* Select Button - Now available for all types */}
           {canSelect && (
             <Button
               size="sm"
@@ -176,7 +176,7 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     <div className="bg-white rounded-xl border border-slate-200 p-4 max-h-96 overflow-auto custom-scrollbar">
       <div className="mb-4 p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border">
         <h4 className="font-semibold text-slate-800 mb-1">Interactive JSON Explorer</h4>
-        <p className="text-sm text-slate-600">Click on any value to add it as a field</p>
+        <p className="text-sm text-slate-600">Click on any field (including arrays/objects) to add it</p>
       </div>
       {renderNode(data, 'root', 'root')}
     </div>

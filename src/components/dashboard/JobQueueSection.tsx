@@ -4,167 +4,320 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
+import { Play, Pause, Trash2, RefreshCw, Clock, Zap, AlertTriangle, CheckCircle } from "lucide-react";
 
 export function JobQueueSection() {
-  const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const jobs = [
     {
-      id: "J-1234",
+      id: "job-001",
       plugin: "Amazon Product Scraper",
-      schedule: "Every 2 hours",
       status: "running",
-      startTime: "14:32:15",
-      endTime: "-",
-      duration: "2m 15s"
+      progress: 65,
+      startTime: "10:30 AM",
+      estimatedCompletion: "11:15 AM",
+      itemsProcessed: 450,
+      totalItems: 692,
+      priority: "high"
     },
     {
-      id: "J-1235",
+      id: "job-002", 
       plugin: "eBay Price Monitor",
-      schedule: "Daily at 9:00 AM",
-      status: "completed",
-      startTime: "09:00:00",
-      endTime: "09:01:45",
-      duration: "1m 45s"
-    },
-    {
-      id: "J-1236",
-      plugin: "News Aggregator",
-      schedule: "Every 30 minutes",
-      status: "failed",
-      startTime: "14:00:00",
-      endTime: "14:00:23",
-      duration: "23s"
-    },
-    {
-      id: "J-1237",
-      plugin: "Stock Price Tracker",
-      schedule: "Every 5 minutes",
-      status: "pending",
+      status: "queued",
+      progress: 0,
       startTime: "-",
-      endTime: "-",
-      duration: "-"
+      estimatedCompletion: "11:45 AM",
+      itemsProcessed: 0,
+      totalItems: 234,
+      priority: "medium"
     },
     {
-      id: "J-1238",
-      plugin: "Weather Data Collector",
-      schedule: "Every hour",
+      id: "job-003",
+      plugin: "News API Aggregator", 
       status: "completed",
-      startTime: "13:00:00",
-      endTime: "13:02:12",
-      duration: "2m 12s"
+      progress: 100,
+      startTime: "9:15 AM",
+      estimatedCompletion: "10:00 AM",
+      itemsProcessed: 1240,
+      totalItems: 1240,
+      priority: "low"
     },
+    {
+      id: "job-004",
+      plugin: "Stock Price Tracker",
+      status: "failed",
+      progress: 23,
+      startTime: "8:45 AM",
+      estimatedCompletion: "-",
+      itemsProcessed: 45,
+      totalItems: 195,
+      priority: "high"
+    },
+    {
+      id: "job-005",
+      plugin: "Social Media Monitor",
+      status: "paused",
+      progress: 78,
+      startTime: "9:30 AM",
+      estimatedCompletion: "12:00 PM",
+      itemsProcessed: 890,
+      totalItems: 1140,
+      priority: "medium"
+    }
   ];
 
-  const filteredJobs = jobs.filter(job => 
-    job.plugin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.plugin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || job.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'running': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'running': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'queued': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
+      case 'failed': return 'bg-red-100 text-red-800 border-red-200';
+      case 'paused': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-slate-100 text-slate-800 border-slate-200';
     }
   };
 
-  const toggleJobSelection = (jobId: string) => {
-    setSelectedJobs(prev => 
-      prev.includes(jobId) 
-        ? prev.filter(id => id !== jobId)
-        : [...prev, jobId]
-    );
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'running': return <Zap className="h-4 w-4" />;
+      case 'queued': return <Clock className="h-4 w-4" />;
+      case 'completed': return <CheckCircle className="h-4 w-4" />;
+      case 'failed': return <AlertTriangle className="h-4 w-4" />;
+      case 'paused': return <Pause className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
+    }
+  };
+
+  const statsCards = [
+    {
+      title: "Total Jobs",
+      value: jobs.length.toString(),
+      icon: Clock,
+      color: "from-blue-500 to-cyan-500",
+      bgColor: "from-blue-50 to-cyan-50"
+    },
+    {
+      title: "Running",
+      value: jobs.filter(j => j.status === 'running').length.toString(),
+      icon: Zap,
+      color: "from-green-500 to-emerald-500", 
+      bgColor: "from-green-50 to-emerald-50"
+    },
+    {
+      title: "Queued",
+      value: jobs.filter(j => j.status === 'queued').length.toString(),
+      icon: Clock,
+      color: "from-yellow-500 to-orange-500",
+      bgColor: "from-yellow-50 to-orange-50"
+    },
+    {
+      title: "Failed",
+      value: jobs.filter(j => j.status === 'failed').length.toString(),
+      icon: AlertTriangle,
+      color: "from-red-500 to-pink-500",
+      bgColor: "from-red-50 to-pink-50"
+    }
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Job Queue</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" disabled={selectedJobs.length === 0}>
-            Retry Failed ({selectedJobs.length})
-          </Button>
-          <Button variant="outline" disabled={selectedJobs.length === 0}>
-            Cancel Running ({selectedJobs.length})
-          </Button>
+    <div className="p-8 space-y-8 bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 min-h-screen">
+      {/* Header */}
+      <div className="text-center py-8">
+        <div className="inline-flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-2xl flex items-center justify-center animate-pulse">
+            <Clock className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Job Queue Management
+            </h1>
+            <p className="text-lg text-slate-600 mt-2">Monitor and control your scraping jobs</p>
+          </div>
         </div>
       </div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="p-4">
-          <Input
-            placeholder="Search jobs by ID or plugin name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {statsCards.map((stat, index) => (
+          <Card key={index} className={`hover-lift bg-gradient-to-br ${stat.bgColor} border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500`}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-1">{stat.title}</p>
+                  <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+                </div>
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}>
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <Card className="bg-gradient-to-br from-white via-slate-50 to-purple-50 border-purple-200 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-purple-500 rounded-lg shadow-lg">
+              <RefreshCw className="h-6 w-6 text-white" />
+            </div>
+            Queue Controls
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <Input
+              placeholder="Search jobs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 h-12 border-purple-200 bg-white/50 backdrop-blur-sm"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48 h-12 border-purple-200 bg-white/50 backdrop-blur-sm">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="queued">Queued</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex gap-3">
+            <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-200 transition-all duration-300 hover:scale-105">
+              <Play className="h-4 w-4 mr-2" />
+              Start All
+            </Button>
+            <Button variant="outline" className="hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600">
+              <Pause className="h-4 w-4 mr-2" />
+              Pause All
+            </Button>
+            <Button variant="outline" className="hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Completed
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Jobs Table */}
-      <Card>
+      <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-xl">
         <CardHeader>
-          <CardTitle>All Jobs</CardTitle>
+          <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Jobs ({filteredJobs.length})
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-4 w-12">
-                    <Checkbox 
-                      checked={selectedJobs.length === filteredJobs.length}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedJobs(filteredJobs.map(job => job.id));
-                        } else {
-                          setSelectedJobs([]);
-                        }
-                      }}
-                    />
-                  </th>
-                  <th className="text-left p-4 font-medium text-gray-900">Job ID</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Plugin</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Schedule</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Status</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Start Time</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Duration</th>
-                  <th className="text-left p-4 font-medium text-gray-900">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-100">
+                  <TableHead className="font-semibold text-slate-700">Job ID</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Plugin</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Priority</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Progress</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Items</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Time</TableHead>
+                  <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredJobs.map((job) => (
-                  <tr key={job.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <Checkbox 
-                        checked={selectedJobs.includes(job.id)}
-                        onCheckedChange={() => toggleJobSelection(job.id)}
-                      />
-                    </td>
-                    <td className="p-4 font-mono text-sm">{job.id}</td>
-                    <td className="p-4">{job.plugin}</td>
-                    <td className="p-4 text-sm text-gray-600">{job.schedule}</td>
-                    <td className="p-4">
-                      <Badge className={getStatusColor(job.status)}>
+                  <TableRow key={job.id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <TableCell className="font-mono text-sm text-slate-600">{job.id}</TableCell>
+                    <TableCell className="font-medium text-slate-900">{job.plugin}</TableCell>
+                    <TableCell>
+                      <Badge className={`${getStatusColor(job.status)} font-medium flex items-center gap-1 w-fit`}>
+                        {getStatusIcon(job.status)}
                         {job.status}
                       </Badge>
-                    </td>
-                    <td className="p-4 font-mono text-sm">{job.startTime}</td>
-                    <td className="p-4 text-sm">{job.duration}</td>
-                    <td className="p-4">
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`${getPriorityColor(job.priority)} font-medium capitalize`}>
+                        {job.priority}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{job.progress}%</span>
+                          <span className="text-slate-500">{job.itemsProcessed}/{job.totalItems}</span>
+                        </div>
+                        <Progress value={job.progress} className="h-2" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="font-medium text-slate-800">{job.itemsProcessed}</div>
+                        <div className="text-slate-500">of {job.totalItems}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="text-slate-800">Started: {job.startTime}</div>
+                        <div className="text-slate-500">ETA: {job.estimatedCompletion}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
+                        {job.status === 'running' ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600"
+                          >
+                            <Pause className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200 hover:text-green-600"
+                          >
+                            <Play className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
