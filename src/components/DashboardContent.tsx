@@ -1,11 +1,14 @@
 
+import { useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { OverviewSection } from "./dashboard/OverviewSection";
 import { PluginManagement } from "./dashboard/PluginManagement";
 import { JobQueueSection } from "./dashboard/JobQueueSection";
 import { WorkerStatus } from "./dashboard/WorkerStatus";
 import { LogsViewer } from "./dashboard/LogsViewer";
+import { SettingsPage } from "./dashboard/SettingsPage";
 import { DashboardBackground } from "./dashboard/DashboardBackground";
+import { ThemeSelector } from "./dashboard/ThemeSelector";
 
 interface DashboardContentProps {
   activeSection: string;
@@ -13,6 +16,18 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ activeSection }: DashboardContentProps) {
+  const [currentTheme, setCurrentTheme] = useState({
+    name: "Blue Ocean",
+    id: "blue",
+    colors: {
+      background: "from-blue-50 via-indigo-50 to-purple-50"
+    }
+  });
+
+  const handleThemeChange = (theme: any) => {
+    setCurrentTheme(theme);
+  };
+
   const renderSection = () => {
     switch (activeSection) {
       case "plugins":
@@ -24,12 +39,7 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
       case "logs":
         return <LogsViewer />;
       case "settings":
-        return (
-          <div className="p-6">
-            <h2 className="text-2xl font-bold gradient-text-blue">Settings</h2>
-            <p className="text-gray-600 mt-2">Settings panel coming soon...</p>
-          </div>
-        );
+        return <SettingsPage />;
       default:
         return <OverviewSection />;
     }
@@ -48,7 +58,8 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
 
   return (
     <div className="flex flex-col h-screen relative">
-      <DashboardBackground />
+      <DashboardBackground theme={currentTheme} />
+      <ThemeSelector onThemeChange={handleThemeChange} />
       
       <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-white/20 px-6 py-4 flex items-center gap-4 shadow-lg">
         <SidebarTrigger className="lg:hidden" />

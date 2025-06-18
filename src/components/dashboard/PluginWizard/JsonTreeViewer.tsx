@@ -59,12 +59,31 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     return words.join(' ');
   };
 
+  const getValuePreview = (value: any, nodeType: string): string => {
+    if (nodeType === 'string') return `"${value}"`;
+    if (nodeType === 'number' || nodeType === 'boolean') return String(value);
+    if (nodeType === 'null') return 'null';
+    if (nodeType === 'array') {
+      if (value.length === 0) return '[]';
+      const firstItem = value[0];
+      if (typeof firstItem === 'object' && firstItem !== null) {
+        const keys = Object.keys(firstItem).slice(0, 3);
+        return `[{${keys.join(', ')}}...] (${value.length} items)`;
+      }
+      return `[${typeof firstItem}...] (${value.length} items)`;
+    }
+    if (nodeType === 'object') {
+      const keys = Object.keys(value).slice(0, 3);
+      return `{${keys.join(', ')}} (${Object.keys(value).length} keys)`;
+    }
+    return String(value);
+  };
+
   const renderNode = (value: any, key: string, path: string, level: number = 0): JSX.Element => {
     const nodeType = getNodeType(value);
     const isExpandable = nodeType === 'object' || nodeType === 'array';
     const isExpanded = expandedNodes.has(path);
     const isSelected = selectedPaths.includes(path);
-    // Cho phép select tất cả types, bao gồm arrays và objects
     const canSelect = value !== null;
 
     return (
@@ -101,21 +120,12 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
             {nodeType}
           </Badge>
 
-          {/* Value Preview */}
-          {!isExpandable && (
-            <span className="text-slate-600 truncate flex-1 max-w-xs">
-              {nodeType === 'string' ? `"${value}"` : String(value)}
-            </span>
-          )}
+          {/* Value Preview - Enhanced to show actual data */}
+          <span className="text-slate-600 text-sm flex-1 max-w-xs truncate">
+            {getValuePreview(value, nodeType)}
+          </span>
 
-          {/* Array/Object Length */}
-          {isExpandable && (
-            <span className="text-slate-500 text-sm">
-              {nodeType === 'array' ? `[${value.length}]` : `{${Object.keys(value).length}}`}
-            </span>
-          )}
-
-          {/* Select Button - Now available for all types */}
+          {/* Select Button */}
           {canSelect && (
             <Button
               size="sm"

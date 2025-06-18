@@ -1,9 +1,19 @@
 
-export function DashboardBackground() {
+interface DashboardBackgroundProps {
+  theme?: {
+    colors: {
+      background: string;
+    };
+  };
+}
+
+export function DashboardBackground({ theme }: DashboardBackgroundProps) {
+  const backgroundGradient = theme?.colors?.background || "from-blue-50 via-indigo-50 to-purple-50";
+  
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Animated Background Gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"></div>
+      {/* Dynamic Background Gradients */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${backgroundGradient}`}></div>
       
       {/* Floating Geometric Shapes */}
       <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse"></div>
