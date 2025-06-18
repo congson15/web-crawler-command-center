@@ -20,7 +20,8 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
     name: "Blue Ocean",
     id: "blue",
     colors: {
-      background: "from-blue-50 via-indigo-50 to-purple-50"
+      background: "from-blue-50 via-indigo-50 to-purple-50",
+      pageGradient: "from-slate-50 via-blue-50 to-indigo-50"
     }
   });
 
@@ -29,19 +30,47 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
   };
 
   const renderSection = () => {
+    const sectionProps = { 
+      className: `bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen` 
+    };
+    
     switch (activeSection) {
       case "plugins":
-        return <PluginManagement />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <PluginManagement />
+          </div>
+        );
       case "jobs":
-        return <JobQueueSection />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <JobQueueSection />
+          </div>
+        );
       case "workers":
-        return <WorkerStatus />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <WorkerStatus />
+          </div>
+        );
       case "logs":
-        return <LogsViewer />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <LogsViewer />
+          </div>
+        );
       case "settings":
-        return <SettingsPage />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <SettingsPage />
+          </div>
+        );
       default:
-        return <OverviewSection />;
+        return (
+          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+            <OverviewSection />
+          </div>
+        );
     }
   };
 

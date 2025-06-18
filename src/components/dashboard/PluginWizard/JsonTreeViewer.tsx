@@ -65,16 +65,34 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     if (nodeType === 'null') return 'null';
     if (nodeType === 'array') {
       if (value.length === 0) return '[]';
+      
+      // Better preview for arrays - show structure of first item
       const firstItem = value[0];
       if (typeof firstItem === 'object' && firstItem !== null) {
-        const keys = Object.keys(firstItem).slice(0, 3);
-        return `[{${keys.join(', ')}}...] (${value.length} items)`;
+        const keys = Object.keys(firstItem);
+        if (keys.length <= 3) {
+          const preview = keys.map(k => `${k}: ${typeof firstItem[k] === 'string' ? `"${firstItem[k]}"` : firstItem[k]}`).join(', ');
+          return `[{${preview}}...] (${value.length} items)`;
+        } else {
+          return `[{${keys.slice(0, 3).join(', ')}, ...}] (${value.length} items)`;
+        }
       }
-      return `[${typeof firstItem}...] (${value.length} items)`;
+      
+      // For primitive arrays
+      const preview = value.slice(0, 3).map((item: any) => 
+        typeof item === 'string' ? `"${item}"` : String(item)
+      ).join(', ');
+      const hasMore = value.length > 3 ? ', ...' : '';
+      return `[${preview}${hasMore}] (${value.length} items)`;
     }
     if (nodeType === 'object') {
-      const keys = Object.keys(value).slice(0, 3);
-      return `{${keys.join(', ')}} (${Object.keys(value).length} keys)`;
+      const keys = Object.keys(value);
+      if (keys.length <= 3) {
+        const preview = keys.map(k => `${k}: ${typeof value[k] === 'string' ? `"${value[k]}"` : value[k]}`).join(', ');
+        return `{${preview}}`;
+      } else {
+        return `{${keys.slice(0, 3).join(', ')}, ...} (${keys.length} keys)`;
+      }
     }
     return String(value);
   };

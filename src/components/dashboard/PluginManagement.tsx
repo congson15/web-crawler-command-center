@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Play, 
   Pause, 
@@ -19,7 +20,8 @@ import {
   AlertCircle,
   Zap,
   Globe,
-  Code
+  Code,
+  RefreshCw
 } from "lucide-react";
 import { EnhancedAddPluginDialog } from "./EnhancedAddPluginDialog";
 
@@ -110,142 +112,66 @@ export function PluginManagement() {
     return matchesSearch && matchesStatus;
   });
 
-  return (
-    <div className="p-8 space-y-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
-      {/* Header Section */}
-      <div className="relative">
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                Plugin Management
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Manage and monitor your web crawling plugins
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
-                <Zap className="h-5 w-5 text-blue-600" />
-                <span className="font-medium text-blue-800">{mockPlugins.length} Active Plugins</span>
-              </div>
-              <EnhancedAddPluginDialog />
-            </div>
-          </div>
+  const statsCards = [
+    {
+      title: "Total Plugins",
+      value: mockPlugins.length.toString(),
+      icon: Globe,
+      color: "from-blue-500 to-cyan-500",
+      bgColor: "from-blue-50 to-cyan-50"
+    },
+    {
+      title: "Running",
+      value: mockPlugins.filter(p => p.status === 'running').length.toString(),
+      icon: Zap,
+      color: "from-green-500 to-emerald-500", 
+      bgColor: "from-green-50 to-emerald-50"
+    },
+    {
+      title: "Paused",
+      value: mockPlugins.filter(p => p.status === 'paused').length.toString(),
+      icon: Pause,
+      color: "from-yellow-500 to-orange-500",
+      bgColor: "from-yellow-50 to-orange-50"
+    },
+    {
+      title: "Failed",
+      value: mockPlugins.filter(p => p.status === 'error').length.toString(),
+      icon: AlertCircle,
+      color: "from-red-500 to-pink-500",
+      bgColor: "from-red-50 to-pink-50"
+    }
+  ];
 
-          {/* Filters */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search plugins..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 border-gray-200 bg-white/80 backdrop-blur-sm"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48 h-12 border-gray-200 bg-white/80 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="Filter by status" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="running">Running</SelectItem>
-                <SelectItem value="paused">Paused</SelectItem>
-                <SelectItem value="error">Error</SelectItem>
-              </SelectContent>
-            </Select>
+  return (
+    <div className="p-8 space-y-8 bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 min-h-screen">
+      {/* Header */}
+      <div className="text-center py-8">
+        <div className="inline-flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-2xl flex items-center justify-center animate-pulse">
+            <Globe className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Plugin Management
+            </h1>
+            <p className="text-lg text-slate-600 mt-2">Manage and monitor your web crawling plugins</p>
           </div>
         </div>
       </div>
 
-      {/* Plugins Grid */}
-      <div className="grid gap-6">
-        {filteredPlugins.map((plugin, index) => (
-          <Card key={plugin.id} className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] group">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {statsCards.map((stat, index) => (
+          <Card key={index} className={`hover-lift bg-gradient-to-br ${stat.bgColor} border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  {/* Plugin Icon & Type */}
-                  <div className="relative">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                      {getTypeIcon(plugin.type)}
-                    </div>
-                    <div className="absolute -top-1 -right-1">
-                      {getStatusIcon(plugin.status)}
-                    </div>
-                  </div>
-
-                  {/* Plugin Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg text-gray-800">{plugin.name}</h3>
-                      <Badge className={`${getStatusColor(plugin.status)} px-3 py-1`}>
-                        {plugin.status}
-                      </Badge>
-                      <Badge variant="outline" className="bg-gray-50">
-                        {plugin.type.toUpperCase()}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                          <Globe className="h-3 w-3" />
-                          {plugin.url.length > 50 ? `${plugin.url.substring(0, 50)}...` : plugin.url}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {plugin.frequency}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span>{plugin.fields} fields configured</span>
-                        <span>Last run: {plugin.lastRun}</span>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-1">{stat.title}</p>
+                  <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 hover:bg-green-50 hover:border-green-300 hover:text-green-600"
-                  >
-                    <Play className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-600"
-                  >
-                    <Pause className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 hover:bg-red-50 hover:border-red-300 hover:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0"
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}>
+                  <stat.icon className="h-6 w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -253,23 +179,154 @@ export function PluginManagement() {
         ))}
       </div>
 
-      {filteredPlugins.length === 0 && (
-        <Card className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl">
-          <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-              <Search className="h-10 w-10 text-gray-400" />
+      {/* Controls */}
+      <Card className="bg-gradient-to-br from-white via-slate-50 to-purple-50 border-purple-200 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="p-2 bg-purple-500 rounded-lg shadow-lg">
+              <RefreshCw className="h-6 w-6 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No plugins found</h3>
-            <p className="text-gray-600 mb-6">
-              {searchTerm || statusFilter !== "all" 
-                ? "Try adjusting your search or filter criteria" 
-                : "Create your first plugin to get started"
-              }
-            </p>
-            {!searchTerm && statusFilter === "all" && <EnhancedAddPluginDialog />}
-          </CardContent>
-        </Card>
-      )}
+            Plugin Controls
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <Input
+              placeholder="Search plugins..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 h-12 border-purple-200 bg-white/50 backdrop-blur-sm"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48 h-12 border-purple-200 bg-white/50 backdrop-blur-sm">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="paused">Paused</SelectItem>
+                <SelectItem value="error">Error</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex gap-3">
+            <EnhancedAddPluginDialog />
+            <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-200 transition-all duration-300 hover:scale-105">
+              <Play className="h-4 w-4 mr-2" />
+              Start All
+            </Button>
+            <Button variant="outline" className="hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600">
+              <Pause className="h-4 w-4 mr-2" />
+              Pause All
+            </Button>
+            <Button variant="outline" className="hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Stopped
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Plugins Table */}
+      <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Plugins ({filteredPlugins.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-100">
+                  <TableHead className="font-semibold text-slate-700">ID</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Plugin</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Type</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                  <TableHead className="font-semibold text-slate-700">URL</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Fields</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Frequency</TableHead>
+                  <TableHead className="font-semibold text-slate-700">Last Run</TableHead>
+                  <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPlugins.map((plugin) => (
+                  <TableRow key={plugin.id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <TableCell className="font-mono text-sm text-slate-600">#{plugin.id}</TableCell>
+                    <TableCell className="font-medium text-slate-900">{plugin.name}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getTypeIcon(plugin.type)}
+                        <Badge variant="outline" className="bg-gray-50 capitalize">
+                          {plugin.type}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`${getStatusColor(plugin.status)} font-medium flex items-center gap-1 w-fit`}>
+                        {getStatusIcon(plugin.status)}
+                        {plugin.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-600 font-mono">
+                        {plugin.url.length > 40 ? `${plugin.url.substring(0, 40)}...` : plugin.url}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-semibold text-slate-800">{plugin.fields}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-600">{plugin.frequency}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-slate-600">{plugin.lastRun}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex gap-2 justify-end">
+                        {plugin.status === 'running' ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600"
+                          >
+                            <Pause className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200 hover:text-green-600"
+                          >
+                            <Play className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600"
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
