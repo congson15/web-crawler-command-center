@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight, Plus, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { JsonPreview } from "./JsonPreview";
 
 interface JsonNode {
   key: string;
@@ -59,44 +60,6 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     return words.join(' ');
   };
 
-  const getValuePreview = (value: any, nodeType: string): string => {
-    if (nodeType === 'string') return `"${value}"`;
-    if (nodeType === 'number' || nodeType === 'boolean') return String(value);
-    if (nodeType === 'null') return 'null';
-    if (nodeType === 'array') {
-      if (value.length === 0) return '[]';
-      
-      // Better preview for arrays - show structure of first item
-      const firstItem = value[0];
-      if (typeof firstItem === 'object' && firstItem !== null) {
-        const keys = Object.keys(firstItem);
-        if (keys.length <= 3) {
-          const preview = keys.map(k => `${k}: ${typeof firstItem[k] === 'string' ? `"${firstItem[k]}"` : firstItem[k]}`).join(', ');
-          return `[{${preview}}...] (${value.length} items)`;
-        } else {
-          return `[{${keys.slice(0, 3).join(', ')}, ...}] (${value.length} items)`;
-        }
-      }
-      
-      // For primitive arrays
-      const preview = value.slice(0, 3).map((item: any) => 
-        typeof item === 'string' ? `"${item}"` : String(item)
-      ).join(', ');
-      const hasMore = value.length > 3 ? ', ...' : '';
-      return `[${preview}${hasMore}] (${value.length} items)`;
-    }
-    if (nodeType === 'object') {
-      const keys = Object.keys(value);
-      if (keys.length <= 3) {
-        const preview = keys.map(k => `${k}: ${typeof value[k] === 'string' ? `"${value[k]}"` : value[k]}`).join(', ');
-        return `{${preview}}`;
-      } else {
-        return `{${keys.slice(0, 3).join(', ')}, ...} (${keys.length} keys)`;
-      }
-    }
-    return String(value);
-  };
-
   const renderNode = (value: any, key: string, path: string, level: number = 0): JSX.Element => {
     const nodeType = getNodeType(value);
     const isExpandable = nodeType === 'object' || nodeType === 'array';
@@ -105,10 +68,10 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
     const canSelect = value !== null;
 
     return (
-      <div key={path} className="relative">
+      <div key={path} className="relative animate-fade-in">
         <div 
-          className={`flex items-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 ${
-            isSelected ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-md' : ''
+          className={`flex items-start gap-3 py-3 px-4 rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:shadow-md ${
+            isSelected ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-lg' : ''
           }`}
           style={{ marginLeft: `${level * 24}px` }}
         >
@@ -116,7 +79,7 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
           {isExpandable ? (
             <button
               onClick={() => toggleNode(path)}
-              className="p-1 hover:bg-blue-100 rounded transition-colors"
+              className="p-1 hover:bg-blue-100 rounded-lg transition-all duration-200 hover:scale-110"
             >
               {isExpanded ? (
                 <ChevronDown className="h-4 w-4 text-blue-600" />
@@ -128,52 +91,54 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
             <div className="w-6 h-6"></div>
           )}
 
-          {/* Key */}
-          <span className="font-medium text-slate-700 min-w-0 flex-shrink-0">
-            {key}:
-          </span>
-
-          {/* Type Badge */}
-          <Badge className={`text-xs px-2 py-0.5 ${getTypeColor(nodeType)}`}>
-            {nodeType}
-          </Badge>
-
-          {/* Value Preview - Enhanced to show actual data */}
-          <span className="text-slate-600 text-sm flex-1 max-w-xs truncate">
-            {getValuePreview(value, nodeType)}
-          </span>
-
-          {/* Select Button */}
-          {canSelect && (
-            <Button
-              size="sm"
-              variant={isSelected ? "default" : "outline"}
-              onClick={() => onFieldSelect(path, generateFieldName(key, path), value)}
-              className={`ml-auto h-7 px-3 transition-all duration-200 ${
-                isSelected 
-                  ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200' 
-                  : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
-              }`}
-            >
-              {isSelected ? (
-                <>
-                  <Eye className="h-3 w-3 mr-1" />
-                  Selected
-                </>
-              ) : (
-                <>
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Field
-                </>
+          <div className="flex-1 min-w-0 space-y-2">
+            {/* Header with key and type */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="font-semibold text-slate-700 text-lg">
+                {key}:
+              </span>
+              <Badge className={`text-xs px-3 py-1 ${getTypeColor(nodeType)}`}>
+                {nodeType}
+              </Badge>
+              
+              {/* Select Button */}
+              {canSelect && (
+                <Button
+                  size="sm"
+                  variant={isSelected ? "default" : "outline"}
+                  onClick={() => onFieldSelect(path, generateFieldName(key, path), value)}
+                  className={`ml-auto h-8 px-4 transition-all duration-300 hover:scale-105 ${
+                    isSelected 
+                      ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200' 
+                      : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 hover:shadow-md'
+                  }`}
+                >
+                  {isSelected ? (
+                    <>
+                      <Eye className="h-3 w-3 mr-1" />
+                      Selected
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add Field
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
-          )}
+            </div>
+
+            {/* Enhanced Preview */}
+            <div className="bg-slate-50 rounded-lg p-3 border">
+              <JsonPreview data={value} maxDepth={2} />
+            </div>
+          </div>
         </div>
 
         {/* Children */}
         {isExpandable && isExpanded && (
-          <div className="relative">
-            <div className="absolute left-3 top-0 bottom-0 w-px bg-gradient-to-b from-blue-200 to-transparent"></div>
+          <div className="relative mt-2">
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-blue-200 to-transparent"></div>
             {nodeType === 'array'
               ? value.map((item: any, index: number) => 
                   renderNode(item, `[${index}]`, `${path}[${index}]`, level + 1)
@@ -190,23 +155,25 @@ export function JsonTreeViewer({ data, onFieldSelect, selectedPaths }: JsonTreeV
 
   if (!data) {
     return (
-      <div className="text-center py-12 text-slate-500">
-        <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
-          <Eye className="h-8 w-8 text-slate-400" />
+      <div className="text-center py-16 text-slate-500">
+        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center shadow-inner">
+          <Eye className="h-10 w-10 text-slate-400" />
         </div>
-        <p className="text-lg font-medium">No JSON data available</p>
+        <p className="text-xl font-medium mb-2">No JSON data available</p>
         <p className="text-sm">Fetch data to explore the JSON structure</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 max-h-96 overflow-auto custom-scrollbar">
-      <div className="mb-4 p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border">
-        <h4 className="font-semibold text-slate-800 mb-1">Interactive JSON Explorer</h4>
-        <p className="text-sm text-slate-600">Click on any field (including arrays/objects) to add it</p>
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 max-h-[600px] overflow-auto custom-scrollbar shadow-xl">
+      <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border shadow-inner">
+        <h4 className="font-bold text-slate-800 mb-2 text-lg">Interactive JSON Explorer</h4>
+        <p className="text-sm text-slate-600">Click on any field (including arrays/objects) to add it. Expand to see detailed previews.</p>
       </div>
-      {renderNode(data, 'root', 'root')}
+      <div className="space-y-1">
+        {renderNode(data, 'root', 'root')}
+      </div>
     </div>
   );
 }
