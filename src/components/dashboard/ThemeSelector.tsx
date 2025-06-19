@@ -53,17 +53,17 @@ const themes = [
   {
     name: "Midnight Black",
     id: "black",
-    primary: "#1f2937",
-    secondary: "#111827",
+    primary: "#60a5fa",
+    secondary: "#3b82f6",
     background: "from-gray-900 via-gray-800 to-black",
     pageGradient: "from-gray-900 via-gray-800 to-slate-900",
-    accent: "#374151"
+    accent: "#1f2937"
   },
   {
     name: "Pure White",
     id: "white",
-    primary: "#f9fafb",
-    secondary: "#f3f4f6",
+    primary: "#1f2937",
+    secondary: "#374151",
     background: "from-white via-gray-50 to-slate-50",
     pageGradient: "from-white via-gray-50 to-slate-100",
     accent: "#f8fafc"
