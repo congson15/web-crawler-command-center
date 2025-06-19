@@ -31,41 +31,43 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
   };
 
   const renderSection = () => {
+    const sectionProps = { currentTheme };
+    
     switch (activeSection) {
       case "plugins":
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <PluginManagement />
+            <PluginManagement {...sectionProps} />
           </div>
         );
       case "jobs":
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <JobQueueSection />
+            <JobQueueSection {...sectionProps} />
           </div>
         );
       case "workers":
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <WorkerStatus />
+            <WorkerStatus {...sectionProps} />
           </div>
         );
       case "logs":
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <LogsViewer />
+            <LogsViewer {...sectionProps} />
           </div>
         );
       case "settings":
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <SettingsPage />
+            <SettingsPage {...sectionProps} />
           </div>
         );
       default:
         return (
           <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <OverviewSection />
+            <OverviewSection {...sectionProps} />
           </div>
         );
     }
@@ -106,7 +108,7 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
             <h1 
-              className="text-2xl font-bold gradient-text"
+              className="text-2xl font-bold"
               style={{ color: currentTheme.primary }}
             >
               {getSectionTitle()}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -95,14 +94,37 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: [0.4, 0, 0.2, 1]
+      ease: "easeOut"
     }
   }
 };
 
-export function PluginManagement() {
+interface PluginManagementProps {
+  currentTheme?: {
+    name: string;
+    id: string;
+    primary: string;
+    secondary: string;
+    background: string;
+    pageGradient: string;
+    accent: string;
+  };
+}
+
+export function PluginManagement({ currentTheme }: PluginManagementProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // Default theme if none provided
+  const theme = currentTheme || {
+    name: "Ocean Blue",
+    id: "blue",
+    primary: "#3b82f6",
+    secondary: "#1e40af",
+    background: "from-blue-50 via-indigo-50 to-purple-50",
+    pageGradient: "from-slate-50 via-blue-50 to-indigo-50",
+    accent: "#dbeafe"
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -194,9 +216,9 @@ export function PluginManagement() {
       <motion.div variants={itemVariants} className="text-center py-8">
         <div className="inline-flex items-center gap-6 mb-8">
           <motion.div 
-            className="w-20 h-20 bg-gradient-to-br theme-bg-primary shadow-2xl rounded-3xl flex items-center justify-center"
+            className="w-20 h-20 shadow-2xl rounded-3xl flex items-center justify-center"
             style={{
-              background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+              background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`
             }}
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -204,7 +226,7 @@ export function PluginManagement() {
             <Globe className="h-10 w-10 text-white" />
           </motion.div>
           <div>
-            <h1 className="text-5xl font-bold gradient-text mb-3">
+            <h1 className="text-5xl font-bold mb-3" style={{ color: theme.primary }}>
               Plugin Management
             </h1>
             <p className="text-xl text-slate-600">Manage and monitor your web crawling plugins</p>
@@ -252,13 +274,25 @@ export function PluginManagement() {
 
       {/* Enhanced Controls */}
       <motion.div variants={itemVariants}>
-        <Card className="bg-gradient-to-br from-white via-slate-50 theme-bg-accent border-2 theme-border-primary shadow-xl overflow-hidden relative">
-          <CardHeader className="bg-gradient-to-r from-slate-50 theme-bg-accent border-b">
-            <CardTitle className="text-2xl font-bold theme-text-primary flex items-center gap-4">
+        <Card 
+          className="border-2 shadow-xl overflow-hidden relative"
+          style={{
+            background: `linear-gradient(135deg, ${theme.accent}cc, ${theme.accent}dd)`,
+            borderColor: theme.primary + '40'
+          }}
+        >
+          <CardHeader 
+            className="border-b"
+            style={{
+              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`,
+              borderColor: theme.primary + '30'
+            }}
+          >
+            <CardTitle className="text-2xl font-bold flex items-center gap-4" style={{ color: theme.primary }}>
               <motion.div 
                 className="p-3 rounded-xl shadow-lg"
                 style={{
-                  background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`
                 }}
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
@@ -276,13 +310,17 @@ export function PluginManagement() {
                   placeholder="Search plugins..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-12 theme-border-primary bg-white/80 backdrop-blur-sm shadow-inner"
+                  className="pl-10 h-12 bg-white/80 backdrop-blur-sm shadow-inner"
+                  style={{ borderColor: theme.primary + '40' }}
                 />
               </div>
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="pl-10 w-full sm:w-48 h-12 theme-border-primary bg-white/80 backdrop-blur-sm">
+                  <SelectTrigger 
+                    className="pl-10 w-full sm:w-48 h-12 bg-white/80 backdrop-blur-sm"
+                    style={{ borderColor: theme.primary + '40' }}
+                  >
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -301,7 +339,10 @@ export function PluginManagement() {
               </motion.div>
               
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button className="btn-gradient shadow-lg shadow-green-200 h-12 px-6">
+                <Button 
+                  className="shadow-lg shadow-green-200 h-12 px-6 text-white font-semibold"
+                  style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
+                >
                   <Play className="h-5 w-5 mr-2" />
                   Start All
                 </Button>
@@ -324,7 +365,10 @@ export function PluginManagement() {
           </CardContent>
           
           <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
-            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-600 rounded-full blur-3xl animate-pulse"></div>
+            <div 
+              className="w-full h-full rounded-full blur-3xl animate-pulse"
+              style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
+            ></div>
           </div>
         </Card>
       </motion.div>
@@ -332,11 +376,24 @@ export function PluginManagement() {
       {/* Enhanced Plugins Table */}
       <motion.div variants={itemVariants}>
         <Card className="bg-white/90 backdrop-blur-xl border-white/20 shadow-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50 theme-bg-accent border-b">
-            <CardTitle className="text-2xl font-semibold theme-text-primary flex items-center gap-3">
-              <Globe className="h-6 w-6" style={{ color: 'var(--theme-primary)' }} />
+          <CardHeader 
+            className="border-b"
+            style={{
+              background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent}cc)`,
+              borderColor: theme.primary + '30'
+            }}
+          >
+            <CardTitle className="text-2xl font-semibold flex items-center gap-3" style={{ color: theme.primary }}>
+              <Globe className="h-6 w-6" style={{ color: theme.primary }} />
               Active Plugins ({filteredPlugins.length})
-              <Badge className="theme-bg-accent theme-text-primary theme-border-primary px-3 py-1">
+              <Badge 
+                className="px-3 py-1"
+                style={{
+                  backgroundColor: theme.accent,
+                  color: theme.primary,
+                  borderColor: theme.primary
+                }}
+              >
                 Live Data
               </Badge>
             </CardTitle>
@@ -345,16 +402,19 @@ export function PluginManagement() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-100 bg-gradient-to-r from-slate-50 theme-bg-accent">
-                    <TableHead className="font-bold theme-text-primary py-4">ID</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Plugin</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Type</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Status</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">URL</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Fields</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Frequency</TableHead>
-                    <TableHead className="font-bold theme-text-primary py-4">Last Run</TableHead>
-                    <TableHead className="text-right font-bold theme-text-primary py-4">Actions</TableHead>
+                  <TableRow 
+                    className="border-slate-100"
+                    style={{ background: `linear-gradient(135deg, ${theme.accent}80, ${theme.accent}60)` }}
+                  >
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>ID</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Plugin</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Type</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Status</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>URL</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Fields</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Frequency</TableHead>
+                    <TableHead className="font-bold py-4" style={{ color: theme.primary }}>Last Run</TableHead>
+                    <TableHead className="text-right font-bold py-4" style={{ color: theme.primary }}>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -364,7 +424,10 @@ export function PluginManagement() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="border-slate-50 hover:bg-gradient-to-r hover:from-slate-50 hover:theme-bg-accent transition-all duration-300 group"
+                      className="border-slate-50 transition-all duration-300 group hover:shadow-lg"
+                      style={{ 
+                        background: `linear-gradient(90deg, transparent, ${theme.accent}20, transparent)` 
+                      }}
                     >
                       <TableCell className="font-mono text-sm text-slate-600 py-4">
                         <Badge variant="outline" className="bg-slate-100">
@@ -376,7 +439,7 @@ export function PluginManagement() {
                           <div 
                             className="w-3 h-3 rounded-full shadow-md"
                             style={{
-                              background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+                              background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`
                             }}
                           ></div>
                           <div>
@@ -410,9 +473,9 @@ export function PluginManagement() {
                         <Badge 
                           className="font-bold px-3 py-1"
                           style={{
-                            backgroundColor: 'var(--theme-accent)',
-                            color: 'var(--theme-primary)',
-                            borderColor: 'var(--theme-primary)'
+                            backgroundColor: theme.accent,
+                            color: theme.primary,
+                            borderColor: theme.primary
                           }}
                         >
                           {plugin.fields} fields
