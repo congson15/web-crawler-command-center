@@ -95,7 +95,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: [0.4, 0, 0.2, 1]
+      ease: "easeOut"
     }
   }
 };
@@ -238,7 +238,6 @@ export function PluginManagement() {
                     <stat.icon className="h-8 w-8 text-white" />
                   </motion.div>
                 </div>
-                {/* Animated background pattern */}
                 <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
                   <div className={`w-full h-full bg-gradient-to-br ${stat.color} rounded-full blur-3xl animate-float`}></div>
                 </div>
@@ -318,7 +317,6 @@ export function PluginManagement() {
             </div>
           </CardContent>
           
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
             <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-600 rounded-full blur-3xl animate-pulse"></div>
           </div>

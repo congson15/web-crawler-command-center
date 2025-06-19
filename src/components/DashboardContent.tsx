@@ -17,12 +17,13 @@ interface DashboardContentProps {
 
 export function DashboardContent({ activeSection }: DashboardContentProps) {
   const [currentTheme, setCurrentTheme] = useState({
-    name: "Blue Ocean",
+    name: "Ocean Blue",
     id: "blue",
-    colors: {
-      background: "from-blue-50 via-indigo-50 to-purple-50",
-      pageGradient: "from-slate-50 via-blue-50 to-indigo-50"
-    }
+    primary: "#3b82f6",
+    secondary: "#1e40af",
+    background: "from-blue-50 via-indigo-50 to-purple-50",
+    pageGradient: "from-slate-50 via-blue-50 to-indigo-50",
+    accent: "#dbeafe"
   });
 
   const handleThemeChange = (theme: any) => {
@@ -30,44 +31,40 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
   };
 
   const renderSection = () => {
-    const sectionProps = { 
-      className: `bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen` 
-    };
-    
     switch (activeSection) {
       case "plugins":
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <PluginManagement />
           </div>
         );
       case "jobs":
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <JobQueueSection />
           </div>
         );
       case "workers":
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <WorkerStatus />
           </div>
         );
       case "logs":
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <LogsViewer />
           </div>
         );
       case "settings":
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <SettingsPage />
           </div>
         );
       default:
         return (
-          <div className={`bg-gradient-to-br ${currentTheme.colors.pageGradient} min-h-screen`}>
+          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
             <OverviewSection />
           </div>
         );
@@ -87,7 +84,7 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
 
   return (
     <div className="flex flex-col h-screen relative">
-      <DashboardBackground theme={currentTheme} />
+      <DashboardBackground theme={{ colors: { background: currentTheme.background } }} />
       <ThemeSelector onThemeChange={handleThemeChange} />
       
       <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-white/20 px-6 py-4 flex items-center gap-4 shadow-lg">
@@ -96,7 +93,7 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg flex items-center justify-center">
             <div className="w-4 h-4 bg-white rounded-sm"></div>
           </div>
-          <h1 className="text-2xl font-bold gradient-text-blue">
+          <h1 className="text-2xl font-bold gradient-text">
             {getSectionTitle()}
           </h1>
         </div>
