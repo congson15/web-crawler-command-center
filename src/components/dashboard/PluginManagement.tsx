@@ -30,13 +30,15 @@ import { EnhancedAddPluginDialog } from "./EnhancedAddPluginDialog";
 const mockPlugins = [
   {
     id: 1,
-    name: "Amazon Product Monitor",
-    url: "https://amazon.com/product/123",
-    type: "html",
+    name: "Pokemon Ditto API",
+    url: "https://pokeapi.co/api/v2/pokemon/ditto",
+    type: "json",
     status: "running",
     lastRun: "2 mins ago",
     fields: 5,
-    frequency: "Every 5 minutes"
+    frequency: "Every 5 minutes",
+    author: "soha",
+    description: "Lấy thông tin pokemon Ditto từ pokeapi"
   },
   {
     id: 2,
@@ -46,7 +48,9 @@ const mockPlugins = [
     status: "paused",
     lastRun: "1 hour ago",
     fields: 8,
-    frequency: "Every 15 minutes"
+    frequency: "Every 15 minutes",
+    author: "dev",
+    description: "Crawl programming subreddit posts"
   },
   {
     id: 3,
@@ -56,7 +60,9 @@ const mockPlugins = [
     status: "error",
     lastRun: "3 hours ago",
     fields: 3,
-    frequency: "Every hour"
+    frequency: "Every hour",
+    author: "admin",
+    description: "Extract news headlines from website"
   },
   {
     id: 4,
@@ -66,7 +72,9 @@ const mockPlugins = [
     status: "running",
     lastRun: "30 seconds ago",
     fields: 12,
-    frequency: "Every minute"
+    frequency: "Every minute",
+    author: "trader",
+    description: "Track real-time stock prices"
   }
 ];
 
@@ -87,7 +95,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: "easeOut"
+      ease: [0.4, 0, 0.2, 1]
     }
   }
 };
@@ -362,7 +370,10 @@ export function PluginManagement() {
                       <TableCell className="py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 shadow-md"></div>
-                          <span className="font-semibold text-slate-900">{plugin.name}</span>
+                          <div>
+                            <span className="font-semibold text-slate-900 block">{plugin.name}</span>
+                            <span className="text-xs text-slate-500">by {plugin.author}</span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
