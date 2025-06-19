@@ -99,7 +99,7 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                       <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.title}</span>
                     </button>
-                  </SidebarMenu>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
