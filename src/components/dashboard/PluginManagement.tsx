@@ -95,7 +95,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: "easeOut"
+      ease: [0.4, 0, 0.2, 1]
     }
   }
 };
@@ -194,7 +194,10 @@ export function PluginManagement() {
       <motion.div variants={itemVariants} className="text-center py-8">
         <div className="inline-flex items-center gap-6 mb-8">
           <motion.div 
-            className="w-20 h-20 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl shadow-2xl flex items-center justify-center"
+            className="w-20 h-20 bg-gradient-to-br theme-bg-primary shadow-2xl rounded-3xl flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+            }}
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
@@ -249,11 +252,14 @@ export function PluginManagement() {
 
       {/* Enhanced Controls */}
       <motion.div variants={itemVariants}>
-        <Card className="bg-gradient-to-br from-white via-slate-50 to-blue-50 border-blue-200 shadow-xl overflow-hidden relative">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-            <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-4">
+        <Card className="bg-gradient-to-br from-white via-slate-50 theme-bg-accent border-2 theme-border-primary shadow-xl overflow-hidden relative">
+          <CardHeader className="bg-gradient-to-r from-slate-50 theme-bg-accent border-b">
+            <CardTitle className="text-2xl font-bold theme-text-primary flex items-center gap-4">
               <motion.div 
-                className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg"
+                className="p-3 rounded-xl shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+                }}
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
               >
@@ -270,13 +276,13 @@ export function PluginManagement() {
                   placeholder="Search plugins..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-12 border-blue-200 bg-white/80 backdrop-blur-sm shadow-inner"
+                  className="pl-10 h-12 theme-border-primary bg-white/80 backdrop-blur-sm shadow-inner"
                 />
               </div>
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="pl-10 w-full sm:w-48 h-12 border-blue-200 bg-white/80 backdrop-blur-sm">
+                  <SelectTrigger className="pl-10 w-full sm:w-48 h-12 theme-border-primary bg-white/80 backdrop-blur-sm">
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -326,11 +332,11 @@ export function PluginManagement() {
       {/* Enhanced Plugins Table */}
       <motion.div variants={itemVariants}>
         <Card className="bg-white/90 backdrop-blur-xl border-white/20 shadow-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-            <CardTitle className="text-2xl font-semibold text-slate-800 flex items-center gap-3">
-              <Globe className="h-6 w-6 text-blue-600" />
+          <CardHeader className="bg-gradient-to-r from-slate-50 theme-bg-accent border-b">
+            <CardTitle className="text-2xl font-semibold theme-text-primary flex items-center gap-3">
+              <Globe className="h-6 w-6" style={{ color: 'var(--theme-primary)' }} />
               Active Plugins ({filteredPlugins.length})
-              <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-3 py-1">
+              <Badge className="theme-bg-accent theme-text-primary theme-border-primary px-3 py-1">
                 Live Data
               </Badge>
             </CardTitle>
@@ -339,16 +345,16 @@ export function PluginManagement() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50">
-                    <TableHead className="font-bold text-slate-700 py-4">ID</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Plugin</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Type</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Status</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">URL</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Fields</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Frequency</TableHead>
-                    <TableHead className="font-bold text-slate-700 py-4">Last Run</TableHead>
-                    <TableHead className="text-right font-bold text-slate-700 py-4">Actions</TableHead>
+                  <TableRow className="border-slate-100 bg-gradient-to-r from-slate-50 theme-bg-accent">
+                    <TableHead className="font-bold theme-text-primary py-4">ID</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Plugin</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Type</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Status</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">URL</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Fields</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Frequency</TableHead>
+                    <TableHead className="font-bold theme-text-primary py-4">Last Run</TableHead>
+                    <TableHead className="text-right font-bold theme-text-primary py-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -358,7 +364,7 @@ export function PluginManagement() {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="border-slate-50 hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50 transition-all duration-300 group"
+                      className="border-slate-50 hover:bg-gradient-to-r hover:from-slate-50 hover:theme-bg-accent transition-all duration-300 group"
                     >
                       <TableCell className="font-mono text-sm text-slate-600 py-4">
                         <Badge variant="outline" className="bg-slate-100">
@@ -367,7 +373,12 @@ export function PluginManagement() {
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 shadow-md"></div>
+                          <div 
+                            className="w-3 h-3 rounded-full shadow-md"
+                            style={{
+                              background: `linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))`
+                            }}
+                          ></div>
                           <div>
                             <span className="font-semibold text-slate-900 block">{plugin.name}</span>
                             <span className="text-xs text-slate-500">by {plugin.author}</span>
@@ -396,7 +407,14 @@ export function PluginManagement() {
                         </span>
                       </TableCell>
                       <TableCell className="py-4">
-                        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 font-bold px-3 py-1">
+                        <Badge 
+                          className="font-bold px-3 py-1"
+                          style={{
+                            backgroundColor: 'var(--theme-accent)',
+                            color: 'var(--theme-primary)',
+                            borderColor: 'var(--theme-primary)'
+                          }}
+                        >
                           {plugin.fields} fields
                         </Badge>
                       </TableCell>

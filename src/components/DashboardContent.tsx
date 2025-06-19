@@ -87,15 +87,31 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
       <DashboardBackground theme={{ colors: { background: currentTheme.background } }} />
       <ThemeSelector onThemeChange={handleThemeChange} />
       
-      <header className="relative z-10 bg-white/80 backdrop-blur-xl border-b border-white/20 px-6 py-4 flex items-center gap-4 shadow-lg">
-        <SidebarTrigger className="lg:hidden" />
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-sm"></div>
+      <header 
+        className="relative z-10 backdrop-blur-xl border-b shadow-lg"
+        style={{
+          background: `linear-gradient(135deg, ${currentTheme.accent}cc, ${currentTheme.accent}dd)`,
+          borderColor: currentTheme.primary + '40'
+        }}
+      >
+        <div className="px-6 py-4 flex items-center gap-4">
+          <SidebarTrigger className="lg:hidden" />
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-8 h-8 rounded-lg shadow-lg flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`
+              }}
+            >
+              <div className="w-4 h-4 bg-white rounded-sm"></div>
+            </div>
+            <h1 
+              className="text-2xl font-bold gradient-text"
+              style={{ color: currentTheme.primary }}
+            >
+              {getSectionTitle()}
+            </h1>
           </div>
-          <h1 className="text-2xl font-bold gradient-text">
-            {getSectionTitle()}
-          </h1>
         </div>
       </header>
       

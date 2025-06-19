@@ -58,13 +58,21 @@ interface AppSidebarProps {
 
 export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps) {
   return (
-    <Sidebar className="border-r border-gray-200">
-      <SidebarHeader className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-gray-900">Crawler Manager</h2>
+    <Sidebar className="theme-border-primary" style={{ borderColor: 'var(--theme-primary)' + '30' }}>
+      <SidebarHeader 
+        className="px-6 py-4 border-b"
+        style={{ 
+          borderColor: 'var(--theme-primary)' + '30',
+          background: `linear-gradient(135deg, var(--theme-accent), var(--theme-accent)cc)`
+        }}
+      >
+        <h2 className="text-xl font-bold theme-text-primary" style={{ color: 'var(--theme-primary)' }}>
+          Crawler Manager
+        </h2>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <SidebarGroupLabel className="px-6 text-xs font-medium uppercase tracking-wider theme-text-primary" style={{ color: 'var(--theme-primary)' + 'aa' }}>
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-3">
@@ -73,11 +81,16 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton 
                     asChild
-                    className={`w-full rounded-lg ${
+                    className={`w-full rounded-lg transition-all duration-200 ${
                       activeSection === item.id 
-                        ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                        ? 'shadow-md' 
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
+                    style={activeSection === item.id ? {
+                      background: `linear-gradient(135deg, var(--theme-accent), var(--theme-accent)dd)`,
+                      color: 'var(--theme-primary)',
+                      borderColor: 'var(--theme-primary)'
+                    } : {}}
                   >
                     <button
                       onClick={() => setActiveSection(item.id)}
@@ -86,7 +99,7 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                       <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.title}</span>
                     </button>
-                  </SidebarMenuButton>
+                  </SidebarMenu>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
