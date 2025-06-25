@@ -102,7 +102,7 @@ export function PluginManagement({ currentTheme }: PluginManagementProps) {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
+        ease: [0.25, 0.1, 0.25, 1]
       }
     }
   };
@@ -113,7 +113,7 @@ export function PluginManagement({ currentTheme }: PluginManagementProps) {
       opacity: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: [0.25, 0.1, 0.25, 1],
         staggerChildren: 0.1
       }
     }
