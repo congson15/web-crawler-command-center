@@ -35,13 +35,13 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
       case "plugins":
         return <PluginManagement currentTheme={currentTheme} />;
       case "jobs":
-        return <JobQueueSection />;
+        return <JobQueueSection currentTheme={currentTheme} />;
       case "workers":
-        return <WorkerStatus />;
+        return <WorkerStatus currentTheme={currentTheme} />;
       case "logs":
-        return <LogsViewer />;
+        return <LogsViewer currentTheme={currentTheme} />;
       case "settings":
-        return <SettingsPage />;
+        return <SettingsPage currentTheme={currentTheme} />;
       default:
         return <DashboardOverview currentTheme={currentTheme} />;
     }

@@ -9,7 +9,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Play, Pause, Trash2, RefreshCw, Clock, Zap, AlertTriangle, CheckCircle } from "lucide-react";
 
-export function JobQueueSection() {
+interface JobQueueSectionProps {
+  currentTheme: {
+    name: string;
+    id: string;
+    primary: string;
+    secondary: string;
+    background: string;
+    pageGradient: string;
+    accent: string;
+  };
+}
+
+export function JobQueueSection({ currentTheme }: JobQueueSectionProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -141,186 +153,286 @@ export function JobQueueSection() {
   ];
 
   return (
-    <div className="p-8 space-y-8 bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 min-h-screen">
-      {/* Header */}
-      <div className="text-center py-8">
-        <div className="inline-flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-2xl flex items-center justify-center animate-pulse">
-            <Clock className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Job Queue Management
-            </h1>
-            <p className="text-lg text-slate-600 mt-2">Monitor and control your scraping jobs</p>
+    <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
+      <div className="p-8 space-y-8">
+        {/* Header */}
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-4 mb-6">
+            <div 
+              className="w-16 h-16 rounded-2xl shadow-2xl flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`
+              }}
+            >
+              <Clock className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 
+                className="text-4xl font-bold"
+                style={{ color: currentTheme.primary }}
+              >
+                Job Queue Management
+              </h1>
+              <p className="text-lg text-slate-600 mt-2">Monitor and control your scraping jobs</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {statsCards.map((stat, index) => (
-          <Card key={index} className={`hover-lift bg-gradient-to-br ${stat.bgColor} border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500`}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-1">{stat.title}</p>
-                  <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {statsCards.map((stat, index) => (
+            <Card 
+              key={index} 
+              className="hover-lift border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500"
+              style={{ 
+                background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}cc)`,
+                borderColor: `${currentTheme.primary}20`
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 mb-1">{stat.title}</p>
+                    <p 
+                      className="text-3xl font-bold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div 
+                    className="p-3 rounded-xl shadow-lg"
+                    style={{
+                      background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`
+                    }}
+                  >
+                    <stat.icon className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}>
-                  <stat.icon className="h-6 w-6 text-white" />
-                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Controls */}
+        <Card 
+          className="border-white/50 shadow-xl"
+          style={{ 
+            background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}cc)`,
+            borderColor: `${currentTheme.primary}30`
+          }}
+        >
+          <CardHeader>
+            <CardTitle 
+              className="text-xl font-bold flex items-center gap-3"
+              style={{ color: currentTheme.primary }}
+            >
+              <div 
+                className="p-2 rounded-lg shadow-lg"
+                style={{ backgroundColor: currentTheme.primary }}
+              >
+                <RefreshCw className="h-6 w-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Controls */}
-      <Card className="bg-gradient-to-br from-white via-slate-50 to-purple-50 border-purple-200 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="p-2 bg-purple-500 rounded-lg shadow-lg">
-              <RefreshCw className="h-6 w-6 text-white" />
+              Queue Controls
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <Input
+                placeholder="Search jobs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 h-12 bg-white/50 backdrop-blur-sm"
+                style={{ borderColor: `${currentTheme.primary}30` }}
+              />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger 
+                  className="w-full sm:w-48 h-12 bg-white/50 backdrop-blur-sm"
+                  style={{ borderColor: `${currentTheme.primary}30` }}
+                >
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="running">Running</SelectItem>
+                  <SelectItem value="queued">Queued</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="paused">Paused</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            Queue Controls
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <Input
-              placeholder="Search jobs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 h-12 border-purple-200 bg-white/50 backdrop-blur-sm"
-            />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48 h-12 border-purple-200 bg-white/50 backdrop-blur-sm">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="running">Running</SelectItem>
-                <SelectItem value="queued">Queued</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="paused">Paused</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex gap-3">
-            <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-200 transition-all duration-300 hover:scale-105">
-              <Play className="h-4 w-4 mr-2" />
-              Start All
-            </Button>
-            <Button variant="outline" className="hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600">
-              <Pause className="h-4 w-4 mr-2" />
-              Pause All
-            </Button>
-            <Button variant="outline" className="hover:bg-red-50 hover:border-red-200 hover:text-red-600">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear Completed
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            
+            <div className="flex gap-3">
+              <Button 
+                className="shadow-lg transition-all duration-300 hover:scale-105"
+                style={{
+                  background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.secondary})`,
+                  color: 'white'
+                }}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Start All
+              </Button>
+              <Button 
+                variant="outline" 
+                className="hover:scale-105 transition-all duration-300"
+                style={{ borderColor: `${currentTheme.primary}50`, color: currentTheme.primary }}
+              >
+                <Pause className="h-4 w-4 mr-2" />
+                Pause All
+              </Button>
+              <Button 
+                variant="outline" 
+                className="hover:scale-105 transition-all duration-300"
+                style={{ borderColor: `${currentTheme.primary}50`, color: currentTheme.primary }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear Completed
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Jobs Table */}
-      <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Jobs ({filteredJobs.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-slate-100">
-                  <TableHead className="font-semibold text-slate-700">Job ID</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Plugin</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Priority</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Progress</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Items</TableHead>
-                  <TableHead className="font-semibold text-slate-700">Time</TableHead>
-                  <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredJobs.map((job) => (
-                  <TableRow key={job.id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
-                    <TableCell className="font-mono text-sm text-slate-600">{job.id}</TableCell>
-                    <TableCell className="font-medium text-slate-900">{job.plugin}</TableCell>
-                    <TableCell>
-                      <Badge className={`${getStatusColor(job.status)} font-medium flex items-center gap-1 w-fit`}>
-                        {getStatusIcon(job.status)}
-                        {job.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={`${getPriorityColor(job.priority)} font-medium capitalize`}>
-                        {job.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{job.progress}%</span>
-                          <span className="text-slate-500">{job.itemsProcessed}/{job.totalItems}</span>
-                        </div>
-                        <Progress value={job.progress} className="h-2" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div className="font-medium text-slate-800">{job.itemsProcessed}</div>
-                        <div className="text-slate-500">of {job.totalItems}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div className="text-slate-800">Started: {job.startTime}</div>
-                        <div className="text-slate-500">ETA: {job.estimatedCompletion}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex gap-2 justify-end">
-                        {job.status === 'running' ? (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600"
-                          >
-                            <Pause className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200 hover:text-green-600"
-                          >
-                            <Play className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+        {/* Jobs Table */}
+        <Card className="bg-white/80 backdrop-blur-sm border-white/20 shadow-xl">
+          <CardHeader>
+            <CardTitle 
+              className="text-xl font-semibold flex items-center gap-2"
+              style={{ color: currentTheme.primary }}
+            >
+              <Clock className="h-5 w-5" />
+              Jobs ({filteredJobs.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-100">
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Job ID
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Plugin
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Status
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Priority
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Progress
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Items
+                    </TableHead>
+                    <TableHead 
+                      className="font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Time
+                    </TableHead>
+                    <TableHead 
+                      className="text-right font-semibold"
+                      style={{ color: currentTheme.primary }}
+                    >
+                      Actions
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredJobs.map((job) => (
+                    <TableRow key={job.id} className="border-slate-50 hover:bg-slate-50/50 transition-colors">
+                      <TableCell className="font-mono text-sm text-slate-600">{job.id}</TableCell>
+                      <TableCell className="font-medium text-slate-900">{job.plugin}</TableCell>
+                      <TableCell>
+                        <Badge className={`${getStatusColor(job.status)} font-medium flex items-center gap-1 w-fit`}>
+                          {getStatusIcon(job.status)}
+                          {job.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={`${getPriorityColor(job.priority)} font-medium capitalize`}>
+                          {job.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span style={{ color: currentTheme.primary }}>{job.progress}%</span>
+                            <span className="text-slate-500">{job.itemsProcessed}/{job.totalItems}</span>
+                          </div>
+                          <Progress value={job.progress} className="h-2" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div className="font-medium text-slate-800">{job.itemsProcessed}</div>
+                          <div className="text-slate-500">of {job.totalItems}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div className="text-slate-800">Started: {job.startTime}</div>
+                          <div className="text-slate-500">ETA: {job.estimatedCompletion}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          {job.status === 'running' ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600"
+                            >
+                              <Pause className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200 hover:text-green-600"
+                            >
+                              <Play className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
