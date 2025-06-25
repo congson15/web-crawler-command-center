@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { OverviewSection } from "./dashboard/OverviewSection";
+import { DashboardOverview } from "./dashboard/DashboardOverview";
 import { PluginManagement } from "./dashboard/PluginManagement";
 import { JobQueueSection } from "./dashboard/JobQueueSection";
 import { WorkerStatus } from "./dashboard/WorkerStatus";
@@ -33,66 +33,17 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
   const renderSection = () => {
     switch (activeSection) {
       case "plugins":
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <PluginManagement currentTheme={currentTheme} />
-          </div>
-        );
+        return <PluginManagement currentTheme={currentTheme} />;
       case "jobs":
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-6" style={{ color: currentTheme.primary }}>
-                Job Queue Management
-              </h1>
-              <div className="text-gray-600">Job queue functionality coming soon...</div>
-            </div>
-          </div>
-        );
+        return <JobQueueSection />;
       case "workers":
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-6" style={{ color: currentTheme.primary }}>
-                Worker Status
-              </h1>
-              <div className="text-gray-600">Worker status monitoring coming soon...</div>
-            </div>
-          </div>
-        );
+        return <WorkerStatus />;
       case "logs":
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-6" style={{ color: currentTheme.primary }}>
-                System Logs
-              </h1>
-              <div className="text-gray-600">System logs viewer coming soon...</div>
-            </div>
-          </div>
-        );
+        return <LogsViewer />;
       case "settings":
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-6" style={{ color: currentTheme.primary }}>
-                Settings
-              </h1>
-              <div className="text-gray-600">Settings panel coming soon...</div>
-            </div>
-          </div>
-        );
+        return <SettingsPage />;
       default:
-        return (
-          <div className={`bg-gradient-to-br ${currentTheme.pageGradient} min-h-screen`}>
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-6" style={{ color: currentTheme.primary }}>
-                Dashboard Overview
-              </h1>
-              <div className="text-gray-600">Dashboard overview coming soon...</div>
-            </div>
-          </div>
-        );
+        return <DashboardOverview currentTheme={currentTheme} />;
     }
   };
 
