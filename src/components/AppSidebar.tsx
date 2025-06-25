@@ -4,8 +4,7 @@ import {
   Settings, 
   FileText, 
   Clock, 
-  BarChart,
-  TrendingUp
+  BarChart
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,11 +43,6 @@ const menuItems = [
     title: "Logs",
     icon: FileText,
     id: "logs",
-  },
-  {
-    title: "So Sánh Giá",
-    icon: TrendingUp,
-    id: "price-comparison",
   },
   {
     title: "Settings",

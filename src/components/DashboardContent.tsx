@@ -7,7 +7,6 @@ import { JobQueueSection } from "./dashboard/JobQueueSection";
 import { WorkerStatus } from "./dashboard/WorkerStatus";
 import { LogsViewer } from "./dashboard/LogsViewer";
 import { SettingsPage } from "./dashboard/SettingsPage";
-import { PriceComparison } from "./dashboard/PriceComparison";
 import { DashboardBackground } from "./dashboard/DashboardBackground";
 import { ThemeSelector } from "./dashboard/ThemeSelector";
 
@@ -43,8 +42,6 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
         return <LogsViewer currentTheme={currentTheme} />;
       case "settings":
         return <SettingsPage currentTheme={currentTheme} />;
-      case "price-comparison":
-        return <PriceComparison currentTheme={currentTheme} />;
       default:
         return <DashboardOverview currentTheme={currentTheme} />;
     }
@@ -57,7 +54,6 @@ export function DashboardContent({ activeSection }: DashboardContentProps) {
       case "workers": return "Worker Status";
       case "logs": return "System Logs";
       case "settings": return "Settings";
-      case "price-comparison": return "So Sánh Giá";
       default: return "Dashboard Overview";
     }
   };
